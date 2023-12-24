@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments :: header('Home - Shopme Admin')">
+<head th:replace="fragments :: page_header('Home - Shopme Admin')">
 </head>
 <body>
 	<div class="container-fluid">
@@ -8,19 +8,19 @@
 		</div>
 		<div>
 			<h2>Manage Users</h2>
-			<a th:href="@{/users/new}">Create New User</a>
+			<a th:href="@{/users/new}" class="fa-solid fa-user-plus icon-dark"></a>
 			&nbsp; | &nbsp;
-			<a th:href="@{/users/export/csv}">Export to CSV</a>
+			<a th:href="@{/users/export/csv}" class="fa-solid fa-file-csv icon-dark"></a>
 			&nbsp; | &nbsp;
-			<a th:href="@{/users/export/excel}">Export to Excel</a>
+			<a th:href="@{/users/export/excel}" class="fa-solid fa-file-excel icon-dark"></a>
 			&nbsp; | &nbsp;
-			<a th:href="@{/users/export/pdf}">Export to PDF</a>
+			<a th:href="@{/users/export/pdf}" class="fa-solid fa-file-pdf icon-dark"></a>
 		</div>
 		<div th:if="${message != null}" class="alert alert-success text-center">
 			[[${message}]]
 		</div>
 		<div>
-			<form th:action="@{/users/page/1}" class="row g-3 m-3">
+			<form th:action="@{/users/page/1}" class="row g-3 mt-2 mb-3">
 				<input type="hidden" name="sortField" th:value="${sortField}" />
 				<input type="hidden" name="sortOrder" th:value="${sortOrder}" />
 				<div class="col-auto">
@@ -30,58 +30,71 @@
 					<input type="search" name="keyword" th:value="${keyword}" class="form-control" id="keyword"/>
 				</div>
 				<div class="col-auto">
-					<input type="submit" value="Search" class="btn btn-primary"/>
-					<input type="button" value="Clear" class="btn btn-secondary" onclick="clearFilter()"/>
+					<button value="Search" class="btn btn-primary">
+						<i class="fa-solid fa-magnifying-glass"></i>
+					</button>
+					<button type="button" value="Clear" class="btn btn-secondary" onclick="clearFilter()">
+						<i class="fa-solid fa-eraser"></i>
+					</button>
 				</div>
 			</form>
 		</div>
-		<div>
+		<div class="full-details">
 			<table class="table table-responsive-xL table-hover table-bordered table-striped">
 				<thead class="table-dark">
 					<tr>
-						<th th:replace="fragments :: header_sort('id', 'User ID')" />
+						<th class="hideable-column">
+							<th th:replace="fragments :: header_sort('id', 'User ID', 'tag')" />
+						</th>
 						<th>Photo</th>
-						<th th:replace="fragments :: header_sort('email', 'Email')" />
-						<th th:replace="fragments :: header_sort('firstName', 'First Name')" />
-						<th th:replace="fragments :: header_sort('lastName', 'Last Name')" />
+						<th class="hideable-column">
+							<th th:replace="fragments :: header_sort('email', 'Email', 'tag')" />
+						</th>
+						<th th:replace="fragments :: header_sort('firstName', 'First Name', 'none')" />
+						<th th:replace="fragments :: header_sort('lastName', 'Last Name', 'none')" />
 						<th>Roles</th>
-						<th th:replace="fragments :: header_sort('enabled', 'Enabled')" />
+						<th th:replace="fragments :: header_sort('enabled', 'Enabled', 'none')" />
 						<th>Actions</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr th:each="user: ${listUsers}">
-						<td>[[${user.id}]]</td>
+						<td class="hideable-column">[[${user.id}]]</td>
 						<td>
 							<span th:if="${user.photos == null}" class="fa-solid fa-image-portrait fa-xl icon-silver"></span>
 							<img th:if="${user.photos != null}" th:src="@{${user.photoImagePath}}" width="100px"></img>
 						</td>
-						<td>[[${user.email}]]</td>
+						<td class="hideable-column">[[${user.email}]]</td>
 						<td>[[${user.firstName}]]</td>
 						<td>[[${user.lastName}]]</td>
 						<td>[[${user.roles}]]</td>
 						<td>
-							<a th:if="${user.enabled == true}" class="fa-solid fa-circle-check fa-lg icon-green"
-								th:href="@{'/users/' + ${user.id} + '/enabled/false'}"
-								title="Disable this user"></a>
-							<a th:if="${user.enabled == false}" class="fa-solid fa-circle-check fa-lg icon-dark"
-								th:href="@{'/users/' + ${user.id} + '/enabled/true'}"
-								title="Enable this user"></a>
+							<div th:replace="fragments::disable_user"></div>
 						</td>
 						<td>
-							<a class="fa-regular fa-pen-to-square fa-lg icon-green me-3"
-								th:href="@{'/users/edit/' + ${user.id}}"
-								title="Edit this user">
-							</a>
-							<a class="fa-solid fa-trash fa-lg icon-red link-delete"
-							   th:href="@{'/users/delete/' + ${user.id}}"
-							   th:userId="${user.id}"
-							   title="Delete this user">
-							</a>
+							<div th:replace="fragments::edit_user"></div>
+							<div th:replace="fragments::delete_user"></div>
 						</td>
 					</tr>
 				</tbody>
 			</table>
+		</div>
+		<div class="less-details">
+			<div th:each="user : ${listUsers}" class="row">
+				<div class="col-4 mb-2">
+					<span th:if="${user.photos == null}" class="fa-solid fa-image-portrait fa-xl icon-silver"></span>
+					<img th:if="${user.photos != null}" th:src="@{${user.photoImagePath}}" width="100px"></img>
+				</div>
+				<div class="col-8">
+					<div>[[${user.fullName}]]</div>
+					<div>[[${user.roles}]]</div>
+					<div>
+						<div th:replace="fragments::disable_user" class="me-2"></div>
+						<div th:replace="fragments::edit_user"></div>
+						<div th:replace="fragments::delete_user"></div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div class="text-center m-1" th:if="${totalElements > 0}">
 			<span>Showing users # [[${startCount}]] to [[${endCount}]] of [[${totalElements}]]</span>
@@ -91,7 +104,7 @@
 		</div>
 		<div>
 			<nav>
-				<ul class="pagination justify-content-center">
+				<ul class="pagination justify-content-center flex-wrap">
 					<li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
 						<a th:replace="fragments :: paging_link(1, 'First')"></a>
 					</li>

@@ -129,5 +129,9 @@ public class User {
 		if (id == null || photos == null) return "/images/default-user.png";
 		return "/" + Constant.USER_PHOTO_DIR + "/" + this.id + "/" + this.photos;
 	}
-	
+
+	@Transient
+	public String getFullName() {
+		return firstName + " " + lastName;
+	}
 }
